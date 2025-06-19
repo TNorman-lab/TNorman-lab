@@ -1,0 +1,24 @@
+import requests
+import re
+
+def scan_file_for_pii(api_key, file_id):
+    url = f"https://api.cloudstorage.com/v1/files/{file_id}"
+    headers = {"Authorization": f"Bearer {api_key}"}
+    
+    try:
+        response = requests.get(url, headers=headers)
+        file_content = response.json()["content"]
+        
+        ssn_pattern = r"\d{3}-\d{2}-\d{4}"
+        ssns = re.findall(ssn_pattern, file_content)
+        if ssns:
+            print(f"🚨 Found SSNs in file: {ssns}")
+        else:
+            print("✅ No SSNs found.")
+    except Exception as e:
+        print(f"Error: {e}")
+
+# Example usage
+api_key = "your_api_key"
+file_id = "file_123"
+scan_file_for_pii(api_key, file_id)
